@@ -20,23 +20,23 @@ unset ssh_service
 
 #安装配置信息
 nginx_version="nginx-1.23.3"
-openssl_version="openssl-openssl-3.0.7"
+openssl_version="openssl-openssl-3.0.8"
 nginx_prefix="/usr/local/nginx"
 nginx_config="${nginx_prefix}/conf.d/xray.conf"
 nginx_service="/etc/systemd/system/nginx.service"
 nginx_is_installed=""
 
-php_version="php-8.1.13"
+php_version="php-8.2.3"
 php_prefix="/usr/local/php"
 php_service="/etc/systemd/system/php-fpm.service"
 unset php_is_installed
 
-cloudreve_version="3.6.0"
+cloudreve_version="3.7.1"
 cloudreve_prefix="/usr/local/cloudreve"
 cloudreve_service="/etc/systemd/system/cloudreve.service"
 unset cloudreve_is_installed
 
-nextcloud_url="https://download.nextcloud.com/server/releases/nextcloud-25.0.2.zip"
+nextcloud_url="https://download.nextcloud.com/server/prereleases/nextcloud-26.0.0beta4.tar.bz2"
 
 xray_config="/usr/local/etc/xray/config.json"
 unset xray_is_installed
@@ -868,8 +868,14 @@ case "$(uname -m)" in
     'amd64' | 'x86_64')
         machine='amd64'
         ;;
-    'armv5tel' | 'armv6l' | 'armv7' | 'armv7l')
-        machine='arm'
+    'armv5tel')
+        machine='armv5'
+        ;;
+    'armv6l')
+        machine='armv6'
+        ;;
+    'armv7' | 'armv7l')
+        machine='armv7'
         ;;
     'armv8' | 'aarch64')
         machine='arm64'
@@ -1813,7 +1819,7 @@ readPretend()
         if [ $pretend -eq 1 ]; then
             if [ -z "$machine" ]; then
                 red "您的VPS指令集不支持Cloudreve！"
-                yellow "Cloudreve仅支持x86_64、arm64和arm指令集"
+                yellow "Cloudreve仅支持 x86_64, arm64, armv7, armv6, armv5 !"
                 sleep 3s
                 queren=0
             fi
@@ -2007,7 +2013,7 @@ install_web_dependence()
         for i in "${pretend_list[@]}"
         do
             if [ "$i" == "2" ]; then
-                install_dependence ca-certificates wget unzip
+                install_dependence ca-certificates curl bzip2
                 break
             fi
         done
@@ -2015,7 +2021,7 @@ install_web_dependence()
         if [ "$1" == "1" ]; then
             install_dependence ca-certificates wget
         elif [ "$1" == "2" ]; then
-            install_dependence ca-certificates wget unzip
+            install_dependence ca-certificates curl bzip2
         fi
     fi
 }
@@ -2325,7 +2331,8 @@ EOF
 install_update_xray()
 {
     green "正在安装/更新Xray。。。。"
-    if ! bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u root --without-geodata --without-logfiles && ! bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u root --without-geodata --without-logfiles; then
+    if ! bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/
+    )" @ install --version 1.8.0 -u root --without-geodata --without-logfiles && ! bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install --version 1.8.0 -u root --without-geodata --without-logfiles; then
         red    "安装/更新Xray失败"
         yellow "按回车键继续或者按Ctrl+c终止"
         read -s
@@ -2796,14 +2803,19 @@ init_web()
         fi
         turn_on_off_php
     elif [ "${pretend_list[$1]}" == "2" ]; then
-        if ! wget -O "${nginx_prefix}/html/nextcloud.zip" "${nextcloud_url}"; then
+        if ! curl -o "${nginx_prefix}/html/nextcloud.tar.bz2" "${nextcloud_url}"; then
             red    "获取Nextcloud失败"
             yellow "按回车键继续或者按Ctrl+c终止"
             read -s
         fi
+        rm -rf "${nginx_prefix}/html/nextcloud"
+        if ! tar -xjf "${nginx_prefix}/html/nextcloud.tar.bz2" -C "${nginx_prefix}/html"; then
+            red    "解压 Nextcloud 失败"
+            yellow "按回车键继续或者按Ctrl+c终止"
+            read -s
+        fi
+        rm -f "${nginx_prefix}/html/nextcloud.tar.bz2"
         rm -rf "${nginx_prefix}/html/${true_domain_list[$1]}"
-        unzip -q -d "${nginx_prefix}/html" "${nginx_prefix}/html/nextcloud.zip"
-        rm -f "${nginx_prefix}/html/nextcloud.zip"
         mv "${nginx_prefix}/html/nextcloud" "${nginx_prefix}/html/${true_domain_list[$1]}"
         chown -R www-data:www-data "${nginx_prefix}/html/${true_domain_list[$1]}"
         systemctl start php-fpm
@@ -3019,8 +3031,8 @@ print_config_info()
         purple "   (V2RayN(G):SNI;Qv2ray:TLS设置-服务器地址;Shadowrocket:Peer 名称)"
         tyblue "  allowInsecure                 ：\\033[33mfalse"
         purple "   (Qv2ray:TLS设置-允许不安全的证书(不打勾);Shadowrocket:允许不安全(关闭))"
-        tyblue "  fingerprint                   ：\\033[33m空\\033[36m/\\033[33mchrome\\033[32m(推荐)\\033[36m/\\033[33mfirefox\\033[36m/\\033[33msafari"
-        purple "                                    (此选项决定是否伪造浏览器指纹，空代表不伪造，使用GO程序默认指纹)"
+        tyblue "  fingerprint                   ：\\033[33m空\\033[36m/\\033[33mchrome\\033[32m(推荐)\\033[36m/\\033[33mfirefox\\033[36m/\\033[33mios\\033[36m/\\033[33msafari\\033[36m/\\033[33mandroid\\033[36m/\\033[33medge\\033[36m/\\033[33m360\\033[36m/\\033[33mqq\\033[36m/\\033[33mrandom"
+        purple "                                    (此选项决定是否伪造浏览器指纹：空代表不伪造，使用GO程序默认指纹；random代表随机选择一种浏览器伪造指纹)"
         tyblue "  alpn                          ："
         tyblue "                                  伪造浏览器指纹  ：此参数不生效，可随意设置"
         tyblue "                                  不伪造浏览器指纹：若serverName填的域名对应的伪装网站为网盘，建议设置为\\033[33mhttp/1.1\\033[36m；否则建议设置为\\033[33mh2,http/1.1 \\033[35m(此选项为空/未配置时，默认值为\"h2,http/1.1\")"
@@ -3123,6 +3135,7 @@ print_config_info()
         tyblue "------------------------------------------------------------------------"
     fi
     echo
+    yellow "注：部分选项可能分享链接无法涉及，如果不怕麻烦，建议手动填写"
     ask_if "是否生成分享链接？(y/n)" && print_share_link
     echo
     yellow " 关于fingerprint与alpn，详见：https://github.com/kirin10000/Xray-script#关于tls握手tls指纹和alpn"
@@ -3882,12 +3895,8 @@ simplify_system()
     get_system_info
     check_important_dependence_installed "procps" "procps-ng"
     yellow "警告："
-    tyblue " 1. 此功能可能导致某些VPS无法开机，请谨慎使用"
+    tyblue " 1. 此功不能保证在所有系统运行成功 (特别是某些VPS定制系统)，如果运行失败，可能导致VPS无法开机"
     tyblue " 2. 如果VPS上部署了 Xray-TLS+Web 以外的东西，可能被误删"
-    ! ask_if "是否要继续?(y/n)" && return 0
-    echo
-    yellow "提示：在精简系统前请先设置apt/yum/dnf的软件源为http/ftp而非https/ftps"
-    purple "通常来说系统默认即是http/ftp"
     ! ask_if "是否要继续?(y/n)" && return 0
     echo
     local save_ssh=0
@@ -3921,7 +3930,7 @@ simplify_system()
         done
     else
         local debian_remove_packages=('^cron$' '^anacron$' '^cups' '^foomatic' '^openssl$' '^snapd$' '^kdump-tools$' '^flex$' '^make$' '^automake$' '^cloud-init' '^pkg-config$' '^gcc-[1-9][0-9]*$' '^cpp-[1-9][0-9]*$' '^curl$' '^python' '^libpython' '^dbus$' '^at$' '^open-iscsi$' '^rsyslog$' '^acpid$' '^libnetplan0$' '^glib-networking-common$' '^bcache-tools$' '^bind([0-9]|-|$)' '^lshw$' '^thermald' '^libdbus' '^libevdev' '^libupower' '^readline-common$' '^libreadline' '^xz-utils$' '^selinux-utils$' '^wget$' '^zip$' '^unzip$' '^bzip2$' '^finalrd$' '^cryptsetup' '^libplymouth' '^lib.*-dev$' '^perl$' '^perl-modules' '^x11' '^libx11' '^qemu' '^xdg-' '^libglib' '^libicu' '^libxml' '^liburing' '^libisc' '^libdns' '^isc-' '^net-tools$' '^xxd$' '^xkb-data$' '^lsof$' '^task' '^usb' '^libusb' '^doc' '^libwrap' '^libtext' '^libmagic' '^libpci' '^liblocale' '^keyboard' '^libuni[^s]' '^libpipe' '^man-db$' '^manpages' '^liblock' '^liblog' '^libxapian' '^libpsl' '^libpap' '^libgs[0-9]' '^libpaper' '^postfix' '^nginx' '^libnginx' '^libpop' '^libslang' '^apt-utils$' '^google')
-        local debian_keep_packages=('apt-utils' 'whiptail' 'initramfs-tools' 'isc-dhcp-client' 'netplan.io' 'openssh-server' 'network-manager' 'ifupdown' 'ifupdown-ng')
+        local debian_keep_packages=('apt-utils' 'whiptail' 'initramfs-tools' 'isc-dhcp-client' 'netplan.io' 'openssh-server' 'network-manager' 'ifupdown' 'ifupdown-ng' 'ca-certificates')
         local remove_packages=()
         local keep_packages=()
         for i in "${debian_keep_packages[@]}"
@@ -3937,19 +3946,33 @@ simplify_system()
                 remove_packages+=("$package")
             fi
         done
-        #'^libp11' '^libtasn' '^libkey' '^libnet'
-        if ! apt_auto_remove_purge "${remove_packages[@]}"; then
-            red    "精简系统时有错误发生（某些软件包卸载失败）"
-            yellow "请尝试先更新系统软件包再精简系统"
-            tyblue "  更新系统软件包： 1. 运行脚本，选择更新系统/软件包"
-            tyblue "                   2. 选择仅更新软件包"
-            echo
-            tyblue "按回车键继续。。。"
-            read -p
-            $apt_no_install_recommends -y -f install
-        fi
         cp /etc/apt/sources.list sources.list.bak
         sed -i 's#https://#http://#g' /etc/apt/sources.list
+        #'^libp11' '^libtasn' '^libkey' '^libnet'
+        if ! apt_auto_remove_purge "${remove_packages[@]}"; then
+            $apt update
+            $apt -y -f --no-install-recommends install
+            if ! apt_auto_remove_purge "${remove_packages[@]}"; then
+                red    "精简系统时有错误发生（某些软件包卸载失败）"
+                echo
+                tyblue "如果您是小白，建议选择n终止卸载，如果后续仍有出现错误，请重装系统"
+                echo
+                tyblue "否则，可以按照以下步骤尝试修复："
+                tyblue " 1. 阅读错误信息，找到导致卸载错误的软件包；手动运行这条命令可能可以帮助寻找错误包： $apt -f --no-install-recommends install (在终端中运行，参考2)"
+                tyblue " 2. 按ctrl+z将脚本挂在后台，也可尝试新建一个终端(不一定能新建成功)"
+                tyblue " 3. 如果能看出导致卸载错误的原因并解决是最好；如果不能，运行 '$apt update && $apt --no-install-recommends install 软件包名' 手动升级该软件包"
+                tyblue " 4. 运行fg命令返回脚本(对应ctrl+z命令)"
+                tyblue " 5. 在完成上述步骤后，选择y继续卸载"
+                echo
+                if ask_if "继续卸载?(y/n)"; then
+                    if ! apt_auto_remove_purge "${remove_packages[@]}"; then
+                        red "卸载失败！"
+                        tyblue "按回车键继续，如果后续仍有出现错误，请重装系统"
+                        read -s
+                    fi
+                fi
+            fi
+        fi
         for i in "${keep_packages[@]}"
         do
             check_important_dependence_installed "$i" ""
