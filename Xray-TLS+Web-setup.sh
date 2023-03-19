@@ -2802,11 +2802,16 @@ EOF
 cat >> $xray_config <<EOF
         }
     ],
-    "outbounds": [
-        {
-            "protocol": "freedom"
-        }
-    ]
+"outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    },
+    {
+      "tag": "block",
+      "protocol": "blackhole"
+    }
+  ]
 }
 EOF
 }
