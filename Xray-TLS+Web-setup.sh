@@ -2650,6 +2650,28 @@ cat > $xray_config <<EOF
     "log": {
         "loglevel": "none"
     },
+    "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "rules": [
+          {
+            "type": "field",
+            "domain": ["geosite:private"],
+            "ip": ["geoip:private"],
+            "outboundTag": "block"
+          },
+          {
+            "type": "field",
+            "domain": ["geosite:cn", "geosite:category-ir"],
+            "ip": ["geoip:cn", "geoip:ir"],
+            "outboundTag": "block"
+          },
+          {
+            "type": "field",
+            "domain": ["geosite:category-ads-all"],
+            "outboundTag": "block"
+          }
+        ]
+    },
     "inbounds": [
         {
             "port": 443,
