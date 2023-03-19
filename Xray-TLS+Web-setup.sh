@@ -4046,8 +4046,8 @@ change_dns()
 update_geodata()
 {
     tyblue "升级 geodata "
-    sudo wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat --backups=1 -P /usr/local/share/xray
-    sudo wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat --backups=1 -P /usr/local/share/xray
+    wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat --backups=1 -P /usr/local/share/xray
+    wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat --backups=1 -P /usr/local/share/xray
 }
 #开始菜单
 start_menu()
