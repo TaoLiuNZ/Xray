@@ -4043,6 +4043,12 @@ change_dns()
     fi
     green "修改完成！！"
 }
+update_geodata()
+{
+    tyblue "升级 geodata "
+    sudo wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat --backups=1 -P /usr/local/share/xray
+    sudo wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat --backups=1 -P /usr/local/share/xray
+}
 #开始菜单
 start_menu()
 {
@@ -4095,6 +4101,7 @@ start_menu()
     tyblue "   7. 检查更新/更新Nginx"
     tyblue "   8. 更新Cloudreve"
     tyblue "   9. 更新Xray"
+    tyblue "  101. 更新Geodata"
     red    "  10. 卸载Xray-TLS+Web"
     red    "  11. 卸载php"
     red    "  12. 卸载Cloudreve"
@@ -4251,6 +4258,8 @@ start_menu()
         repair_tuige
     elif [ $choice -eq 27 ]; then
         change_dns
+    elif [ $choice -eq 101 ]; then
+        update_geodata
     fi
 }
 
