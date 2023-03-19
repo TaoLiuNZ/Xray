@@ -4258,7 +4258,7 @@ start_menu()
         repair_tuige
     elif [ $choice -eq 27 ]; then
         change_dns
-    elif [ $choice -eq 101 ]; then
+    elif [ $choice -eq 28 ]; then
         update_geodata
     fi
 }
