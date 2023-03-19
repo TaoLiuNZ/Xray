@@ -4101,7 +4101,7 @@ start_menu()
     tyblue "   7. 检查更新/更新Nginx"
     tyblue "   8. 更新Cloudreve"
     tyblue "   9. 更新Xray"
-    tyblue "  101. 更新Geodata"
+    tyblue "  28. 更新Geodata"
     red    "  10. 卸载Xray-TLS+Web"
     red    "  11. 卸载php"
     red    "  12. 卸载Cloudreve"
@@ -4134,7 +4134,7 @@ start_menu()
     echo
     echo
     local choice=""
-    while [[ ! "$choice" =~ ^(0|[1-9][0-9]*)$ ]] || ((choice>27 && choce != 101))
+    while [[ ! "$choice" =~ ^(0|[1-9][0-9]*)$ ]] || ((choice>28))
     do
         read -p "您的选择是：" choice
     done
