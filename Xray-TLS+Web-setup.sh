@@ -4134,7 +4134,7 @@ start_menu()
     echo
     echo
     local choice=""
-    while [[ ! "$choice" =~ ^(0|[1-9][0-9]*)$ ]] || ((choice>27))
+    while [[ ! "$choice" =~ ^(0|[1-9][0-9]*)$ ]] || ((choice>27 && choce != 101))
     do
         read -p "您的选择是：" choice
     done
