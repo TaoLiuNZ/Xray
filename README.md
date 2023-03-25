@@ -39,6 +39,10 @@ bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release
 // 证书安装必须在nginx之前，不然nginx会占用80端口
 apt update && apt install nginx -y\
 把伪装站点的文件全部上传到 /var/www/html\
+
+// Permission
+chmod 755 /var/www/html\
+
 Copy nginx config to /etc/nginx/nginx.conf\
 
 4.开机启动
@@ -53,4 +57,5 @@ Copy nginx config to /etc/nginx/nginx.conf\
  systemctl status xray #查看状态\
  systemctl status nginx #查看ng状态\
  systemctl restart xray\
+ systemctl start nginx\
  systemctl reload nginx\
