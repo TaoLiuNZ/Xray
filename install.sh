@@ -108,7 +108,7 @@ ssl_cert_issue_by_cloudflare() {
             chmod 755 $certPath
         fi
     else
-        
+        exit 1
     fi
 }
 
