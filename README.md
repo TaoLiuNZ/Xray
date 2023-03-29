@@ -59,3 +59,38 @@ Copy nginx config to /etc/nginx/nginx.conf\
  systemctl restart xray\
  systemctl start nginx\
  systemctl reload nginx\
+ 
+ 6. Install Cloudreve
+ mkdir "/usr/local/cloudreve"
+ wget -O "/usr/local/cloudreve/cloudreve.tar.gz" "https://github.com/cloudreve/Cloudreve/releases/download/3.7.1/cloudreve_3.7.1_linux_amd64.tar.gz"
+ tar -zxf "/usr/local/cloudreve/cloudreve.tar.gz" -C "/usr/local/cloudreve" cloudreve
+ rm -f "/usr/local/cloudreve/cloudreve.tar.gz"
+ chmod +x "/usr/local/cloudreve/cloudreve"
+ 
+    # 编辑配置文件
+   /usr/lib/systemd/system/cloudreve.service
+   [Unit]
+   Description=Cloudreve
+   Documentation=https://docs.cloudreve.org
+   After=network.target
+   After=mysqld.service
+   Wants=network.target
+
+   [Service]
+   WorkingDirectory=/usr/local/cloudreve
+   ExecStart=/usr/local/cloudreve/cloudreve
+   Restart=on-abnormal
+   RestartSec=5s
+   KillMode=mixed
+
+   StandardOutput=null
+   StandardError=syslog
+
+   [Install]
+   WantedBy=multi-user.target
+
+   # 启动服务
+  systemctl start cloudreve
+
+  # 设置开机启动
+  systemctl enable cloudreve
