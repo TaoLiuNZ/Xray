@@ -1,24 +1,11 @@
-# Xray
-
-Original Repo: https://github.com/kirin10000/Xray-script
-
-# Some changes need to be made
-Allow beta version --beta\
-Allow logs, remove --without logs\
-Allow geodata, remove --without geodata\
-Allow updating geodata\
-Add updating geodata script\
-Block cn/ir traffic\
-Change script URL
-
+# Prepare
+sudo apt update && sudo apt upgrade
+sudo apt install curl
 
 # Manual steps
 
 1. Certificates
 bash <(curl -Ls https://raw.githubusercontent.com/TaoLiuNZ/Xray/main/install.sh)
-
-// Add paths to node.js project and build
-// Copy server.json to /usr/local/etc/xray/config.json
 
 // Permission
 chmod 755 /root/cert/fullchain.cer
@@ -35,13 +22,16 @@ systemctl daemon-reload 重新加载下\
 2. Xray
 bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u root --beta
 
+// Add paths to node.js project and build
+// Copy server.json to /usr/local/etc/xray/config.json
+
 3. Nginx
 // 证书安装必须在nginx之前，不然nginx会占用80端口
 apt update && apt install nginx -y\
-把伪装站点的文件全部上传到 /var/www/html\
+// 把伪装站点的文件全部上传到 /var/www/html\
 
 // Permission
-chmod 755 /var/www/html\
+// chmod 755 /var/www/html\
 
 Copy nginx config to /etc/nginx/nginx.conf\
 
